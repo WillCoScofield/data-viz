@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import {
   Component,
   ElementRef,
@@ -37,6 +36,7 @@ export class D3BarchartComponent implements OnChanges {
   }
 
   onResize(event) {
+    d3.select('svg').remove();
     this.createChart();
   }
 

@@ -20,6 +20,7 @@ interface Link {
   encapsulation: ViewEncapsulation.None
 })
 export class D3NetworkComponent implements OnInit {
+
   ngOnInit() {
     const svg = d3.select('svg');
     const width = +svg.attr('width');
