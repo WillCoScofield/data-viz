@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { PlotlyViaCDNModule, PlotlyViaWindowModule } from 'angular-plotly.js';
+import { PlotlyViaCDNModule } from 'angular-plotly.js';
 import { ChartsModule } from 'ng2-charts';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -49,7 +49,7 @@ PlotlyViaCDNModule.plotlyVersion = '1.49.4';
     D3PageComponent,
     PlotlyMapComponent,
     D3CircleComponent,
-    D3NetworkComponent,
+    D3NetworkComponent
   ],
   imports: [
     BrowserModule,

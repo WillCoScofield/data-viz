@@ -1,91 +1,96 @@
-import { Component, OnChanges, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import * as d3 from 'd3';
+
+
+interface Node {
+  id: string;
+  group: number;
+}
+
+interface Link {
+  source: string;
+  target: string;
+  value: number;
+}
 
 @Component({
   selector: 'app-d3-network',
   templateUrl: './d3-network.component.html',
-  styleUrls: ['./d3-network.component.scss']
+  styleUrls: ['./d3-network.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
-export class D3NetworkComponent implements OnChanges {
+export class D3NetworkComponent implements OnInit {
+  ngOnInit() {
+    const svg = d3.select('svg');
+    const width = +svg.attr('width');
+    const height = +svg.attr('height');
 
-  constructor() { }
-
-  ngOnChanges(): void {
-    this.createChart();
-  }
-
-  onResize(event) {
-    this.createChart();
-  }
-
-  createChart() {
-    // tslint:disable-next-line: one-variable-per-declaration
-    const svg = d3.select('svg'),
-      width = +svg.attr('width'),
-      height = +svg.attr('height');
-
-    const color = d3.scaleOrdinal(d3.schemeCategory10);
+    const color = d3.scaleOrdinal(d3.schemeCategory20);
 
     const simulation = d3.forceSimulation()
-      // tslint:disable-next-line: only-arrow-functions
-      .force('link', d3.forceLink().id(function (d) { return d.id; }))
+      .force('link', d3.forceLink().id((d: any) => d.id))
       .force('charge', d3.forceManyBody())
       .force('center', d3.forceCenter(width / 2, height / 2));
 
-    // tslint:disable-next-line: only-arrow-functions
-    d3.json('miserables.json', (error, graph) => {
-      if (error) { throw error; }
+    d3.json('assets/miserables.json', (err, data: any) => {
+      if (err) { throw new Error('Bad data file!'); }
+
+      const nodes = [];
+      const links = [];
+
+      data.nodes.forEach((d) => {
+        nodes.push(d);
+      });
+
+      data.links.forEach((d) => {
+        links.push(d);
+      });
+      const graph = { nodes, links };
 
       const link = svg.append('g')
         .attr('class', 'links')
         .selectAll('line')
         .data(graph.links)
-        .enter().append('line')
-        // tslint:disable-next-line: only-arrow-functions
-        .attr('stroke-width', function (d) { return Math.sqrt(d.value); });
+        .enter()
+        .append('line')
+        .attr('stroke-width', (d: any) => Math.sqrt(d.value));
 
       const node = svg.append('g')
         .attr('class', 'nodes')
-        .selectAll('g')
+        .selectAll('circle')
         .data(graph.nodes)
-        .enter().append('g')
-
-      const circles = node.append('circle')
+        .enter()
+        .append('circle')
         .attr('r', 5)
-        .attr('fill', function (d) { return color(d.group); })
-        .call(d3.drag()
-          .on('start', dragstarted)
-          .on('drag', dragged)
-          .on('end', dragended));
+        .attr('fill', (d: any) => color(d.group));
 
-      const lables = node.append('text')
-        .text(function (d) {
-          return d.id;
-        })
-        .attr('x', 6)
-        .attr('y', 3);
+
+      svg.selectAll('circle').call(d3.drag()
+        .on('start', dragstarted)
+        .on('drag', dragged)
+        .on('end', dragended)
+      );
 
       node.append('title')
-        .text(function (d) { return d.id; });
+        .text((d) => d.id);
 
       simulation
         .nodes(graph.nodes)
         .on('tick', ticked);
 
-      simulation.force('link')
+      simulation.force<d3.ForceLink<any, any>>('link')
         .links(graph.links);
 
       function ticked() {
         link
-          .attr('x1', function (d) { return d.source.x; })
-          .attr('y1', function (d) { return d.source.y; })
-          .attr('x2', function (d) { return d.target.x; })
-          .attr('y2', function (d) { return d.target.y; });
+          .attr('x1', function (d: any) { return d.source.x; })
+          .attr('y1', function (d: any) { return d.source.y; })
+          .attr('x2', function (d: any) { return d.target.x; })
+          .attr('y2', function (d: any) { return d.target.y; });
 
         node
-          .attr('transform', function (d) {
-            return 'translate(' + d.x + ',' + d.y + ')';
-          })
+          .attr('cx', function (d: any) { return d.x; })
+          .attr('cy', function (d: any) { return d.y; });
       }
     });
 
@@ -106,5 +111,4 @@ export class D3NetworkComponent implements OnChanges {
       d.fy = null;
     }
   }
-
 }
